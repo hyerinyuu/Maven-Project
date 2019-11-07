@@ -5,21 +5,59 @@
   
  <mapper namespace="com.biz.sec.dao.MDDao">
  	
+ 	<!--  
+ 		master table의 리스트를 추출하고
+ 		master table의 각 레코드의 m_seq칼럼의 값을
+ 		select id=detail에게 보내서
+ 		tbl_detail로부터 값을 추출하라
+ 		
+ 		MDVO : MasterDetailVO.class
+ 		id(masterDetail) : selectAll이 결과를 추출하여 보낼 가상의 method
+ 	 -->
  	<resultMap type="MDVO" id="masterDetail">
  	
+ 	
+      	<!--  
+      		tbl_master의 pk를 지정
+      		column : tbl_master테이블의 칼럼명
+      		property : MDVO의 필드 변수명
+      		
+      		result로 설정할 수도 있지만 PK인 경우는 id로 설정한다.
+      		<result column="m_seq" property="m_seq"/>
+      	 -->
  		<id column="m_seq" property="m_seq"/>
-		<result column="m_subject" property="m_subject"/> 	
+
+ 		
+ 		<!-- 
+ 			그외 MasterDetailVO에 설정된 필드 변수들을
+ 			result항목에 위와 같이 설정
+ 				column : tbl_master의 테이블 칼럼명
+ 				property : VO클래스의 필드변수
+ 		 -->
+ 		<result column="m_subject" property="m_subject"/> 	
 		
+		
+		<!-- 
+		 	Collection : tbl_master테이블과 연관하여 별도로 가져올 
+		 	detail(sub) table의 정보를 담을 리스트 필드변수 설정
+		 	
+		 	property : List<VO> 변수명으로 설정된 변수명을 명시
+		 	column : selectAll 결과가 가져온 칼럼명
+		 	of Type : List에 포함할 VO클래스의 alias
+		 	select : detail table을 조회할 select 구문의 id값
+		 -->
 		<collection property="deList" column="m_seq" ofType="DetailDTO"
 		 select="detail"/>
 	 	</resultMap>
  	
+ 	<!--  tbl_master의 레코드들을 모두 추출하여 List<masterDTO>에 담아라 -->
  	<select id="selectAll" resultMap="masterDetail">
  	
  		SELECT * FROM tbl_master
 
  	</select>
  	
+ 	<!--  m_seq값을 변수로 받아서 d_m_seq = m_seq 조건의 리스트만 추출하여 Lists<detailDTO> 에 담아라-->
  	<select id="detail" resultType="DetailDTO">
  		
  		SELECT 
